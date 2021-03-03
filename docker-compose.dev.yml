@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  bot:
+    container_name: bot
+    image: bot-women-day
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      LOGGING_LEVEL: ${LOGGING_LEVEL:-INFO}
+      TZ: Asia/Yekaterinburg
+    ports:
+      - "${SERVICES_BIND_IP:-0.0.0.0}:8080:8080"
+    networks:
+      - backend_nw
+    volumes:
+      - ${LOCAL_DIR}/app:/opt/bot_women_day/app
+
+networks:
+  backend_nw:
+    driver: bridge
