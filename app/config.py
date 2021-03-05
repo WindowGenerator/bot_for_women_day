@@ -9,4 +9,5 @@ with open(f'{os.path.dirname(__file__)}/logging_config.yaml', 'r') as file:
 configuration = {
     'token': os.environ.get('BOT_TOKEN'),
     'logging_level': os.environ.get('LOGGING_LEVEL', 'DEBUG').upper(),
+    'callbacks_checker_delay': 2,
 }

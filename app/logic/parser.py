@@ -6,7 +6,7 @@ API_PATH = "https://yandex.ru/lab/api/postcard?name="
 
 
 async def parse(session: aiohttp.ClientSession, name: str):
-    async with session.get(API_PATH + name) as response:
+    async with session.get(API_PATH + str(name)) as response:
         json = await response.json(encoding="utf-8")
     url_to_image = json['image']
     text = json['text']
@@ -16,14 +16,12 @@ async def parse(session: aiohttp.ClientSession, name: str):
 
     return image_bytes, text
 
-
-
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    session = aiohttp.ClientSession(loop=loop)
+    _session = aiohttp.ClientSession(loop=loop)
 
-    loop.run_until_complete(parse(session, 'test'))
-    loop.run_until_complete(session.close())
+    loop.run_until_complete(parse(_session, 'test'))
+    loop.run_until_complete(_session.close())
 
     loop.stop()
     loop.close()

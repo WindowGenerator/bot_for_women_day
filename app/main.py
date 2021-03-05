@@ -5,8 +5,8 @@ from typing import AsyncGenerator
 import aiohttp
 from aiohttp.web import Application, run_app
 
-from app.bot.commands import *
 from app.bot.bot import bot, dp
+from app.bot.commands import *
 from app.config import configuration
 from app.logic.sender import SenderCongratulationsMessage
 from app.tasks import cancel_and_stop_task, run_background_task
