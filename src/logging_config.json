@@ -1,0 +1,43 @@
+﻿{
+  "version": 1,
+  "root": {
+    "handlers": [
+      "console"
+    ],
+    "level": "DEBUG"
+  },
+  "disable_existing_loggers": false,
+  "loggers": {
+    "api": {
+      "level": "INFO"
+    },
+    "aiogram": {
+      "level": "INFO"
+    },
+    "lazy_exam_bot": {
+      "level": "DEBUG"
+    },
+    "alembic.runtime.migration": {
+      "level": "INFO"
+    },
+    "db.utils": {
+      "level": "INFO"
+    },
+    "gino": {
+      "level": "ERROR"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "formatter": "default",
+      "level": "DEBUG",
+      "stream": "ext://sys.stdout"
+    }
+  },
+  "formatters": {
+    "default": {
+      "format": "[%(levelname)-8s] %(asctime)s [%(process)-5s]%(threadName)s@'%(name)s.%(funcName)s:%(lineno)s': %(message)s"
+    }
+  }
+}

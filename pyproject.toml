@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "bot_women_day"
+version = "0.0.1"
+description = "A bot that is designed to give a holiday to girls"
+authors = ["Schudov <schudov@ussc.ru>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = "^3.8.1"
+aiogram = "^2.20"
+click = "^8.1.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+black = "^22.3.0"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+pythonpath = ["./"]
+addopts = "-ra"
+testpaths = [
+    "tests"
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
