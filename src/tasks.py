@@ -1,10 +1,8 @@
 import logging
 import sys
-
-from asyncio import CancelledError, Task, sleep, ensure_future, Future
-from functools import wraps, partial
-from typing import Callable, Coroutine, Awaitable, Union
-
+from asyncio import CancelledError, Future, Task, ensure_future, sleep
+from functools import partial, wraps
+from typing import Awaitable, Callable, Coroutine, Union
 
 logger = logging.getLogger(__name__)
 
@@ -19,14 +17,14 @@ async def cancel_and_stop_task(task: Union[Task, Future]):
         await task
 
     except CancelledError:
-        logger.debug('Задача была отменена нами же')
+        logger.debug("Задача была отменена нами же")
         # WARN: Здесь НЕЛЬЗЯ делать `raise' потому что тогда данная функция никогда не закончится.
 
     except Exception as err:
-        logger.exception(f'Задача была завершена с ошибкой ({err}):')
+        logger.exception(f"Задача была завершена с ошибкой ({err}):")
 
     else:
-        logger.debug('Задача успешно завершена')
+        logger.debug("Задача успешно завершена")
 
 
 def run_forever(repeat_delay: int = 0, failure_delay: int = None):
@@ -41,18 +39,20 @@ def run_forever(repeat_delay: int = 0, failure_delay: int = None):
     def decorator(func: Callable[..., Coroutine]):
         @wraps(func)
         async def task_wrapper(*args, **kwargs):
-            logger.debug('Запуск бесконечной задачи')
+            logger.debug("Запуск бесконечной задачи")
 
             while True:
                 try:
                     await func(*args, **kwargs)
 
                 except CancelledError:
-                    logger.debug('Бесконечная задача отменена')
+                    logger.debug("Бесконечная задача отменена")
                     raise
 
                 except Exception as err:
-                    logger.exception(f'Неожиданная ошибка во время работы бесконечной задачи ({err}):')
+                    logger.exception(
+                        f"Неожиданная ошибка во время работы бесконечной задачи ({err}):"
+                    )
                     await sleep(failure_delay)
 
                 else:
@@ -65,18 +65,22 @@ def run_forever(repeat_delay: int = 0, failure_delay: int = None):
 
 def _default_on_complete(name: str, future: Future):
     if future.cancelled():
-        logger.debug(f'Задача {name} отменена')
+        logger.debug(f"Задача {name} отменена")
         return
 
     error = future.exception()
     if error is not None:
-        logger.error(f'Неожиданная ошибка в задаче {name}:', exc_info=error)
+        logger.error(f"Неожиданная ошибка в задаче {name}:", exc_info=error)
         sys.exit(1)
 
-    logger.debug(f'Задача {name} успешно завершена')
+    logger.debug(f"Задача {name} успешно завершена")
 
 
-def run_background_task(future: Awaitable, name: str, on_complete: Callable[[Future], None] = _default_on_complete) -> Future:
+def run_background_task(
+    future: Awaitable,
+    name: str,
+    on_complete: Callable[[Future], None] = _default_on_complete,
+) -> Future:
     """
     Обертка для запуска задач в фоне.
     :param future: фоновый таск

@@ -16,7 +16,7 @@ services:
     networks:
       - backend_nw
     volumes:
-      - ${LOCAL_DIR}/app:/opt/bot_women_day/app
+      - ${LOCAL_DIR}/src:/opt/bot_women_day/src
 
 networks:
   backend_nw:
