@@ -10,6 +10,5 @@ with codecs.open(
 
 configuration = {
     "token": os.environ.get("BOT_TOKEN"),
-    "logging_level": os.environ.get("LOGGING_LEVEL", "DEBUG").upper(),
-    "callbacks_checker_delay": 2,
+    "logging_level": os.environ.get("LOGGING_LEVEL", "DEBUG").upper()
 }

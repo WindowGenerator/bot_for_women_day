@@ -15,14 +15,3 @@ async def parse(session: aiohttp.ClientSession, name: str):
         image_bytes = await image_response.content.read()
 
     return image_bytes, text
-
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    _session = aiohttp.ClientSession(loop=loop)
-
-    loop.run_until_complete(parse(_session, "test"))
-    loop.run_until_complete(_session.close())
-
-    loop.stop()
-    loop.close()

@@ -1,25 +1,78 @@
-FROM python:3.9.12-slim-bullseye
+FROM python:3.9.12-slim-bullseye as python-base
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    \
+    # poetry
+    # https://python-poetry.org/docs/configuration/#using-environment-variables
+    POETRY_VERSION=1.1.13 \
+    # make poetry install to this location
+    POETRY_HOME="/opt/poetry" \
+    # make poetry create the virtual environment in the project's root
+    # it gets named `.venv`
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    # do not ask any interactive question
+    POETRY_NO_INTERACTION=1 \
+    \
+    # paths
+    # this is where our requirements + virtual environment will live
+    PYSETUP_PATH="/opt/pysetup" \
+    VENV_PATH="/opt/pysetup/.venv"
+
+
+# prepend poetry and venv to path
+ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 RUN groupadd --system bots && useradd --system -g bots bot_women_day
 
+FROM python-base as builder-base
+
 RUN apt-get update ; \
     apt-get install -y \
+		curl \
 	    gcc \
 		libc6-dev \
 		libssl-dev \
 		libpq-dev \
-		python-dev
+		build-essential
 
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
-EXPOSE 80
+WORKDIR $PYSETUP_PATH
+COPY poetry.lock pyproject.toml ./
+
+RUN poetry install --no-dev
 
 RUN mkdir -p /opt/bot_women_day
 ENV APP_DIR /opt/bot_women_day
+
+FROM python-base as development
+
+ENV BOT_ENV=development
+WORKDIR $PYSETUP_PATH
+
+# copy in our built poetry + venv
+COPY --from=builder-base $POETRY_HOME $POETRY_HOME
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
+# quicker install as runtime deps are already installed
+RUN poetry install
+
+COPY src $APP_DIR/src/
+# RUN poetry install
+
+FROM python-base as production
+
+ENV FASTAPI_ENV=production
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
 WORKDIR $APP_DIR
 
 COPY src $APP_DIR/src/
-RUN pip3 install --upgrade pip && pip3 install -r src/requirements.txt
 
 USER bot_women_day
 
